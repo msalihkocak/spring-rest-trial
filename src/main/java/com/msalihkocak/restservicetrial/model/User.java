@@ -1,10 +1,12 @@
 package com.msalihkocak.restservicetrial.model;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 
@@ -26,6 +28,9 @@ public class User {
 	@Past
 	@ApiModelProperty(notes = "Birthdate should be in the past.")
 	private Date birthDate;
+	
+	@OneToMany(mappedBy = "author")
+	private List<Post> posts;
 	
 	public User() {
 		super();
@@ -59,6 +64,14 @@ public class User {
 
 	public Date getBirthDate() {
 		return birthDate;
+	}
+
+	public List<Post> getPosts() {
+		return posts;
+	}
+
+	public void setPosts(List<Post> posts) {
+		this.posts = posts;
 	}
 
 	@Override

@@ -2,13 +2,33 @@ package com.msalihkocak.restservicetrial.model;
 
 import java.util.Date;
 
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+@Entity
 public class Post {
+	
+	@Id
+	@GeneratedValue
 	private Long id;
+	
 	private String title;
 	private String body;
-	private User author;
 	private Date publishDate;
 	
+	@ManyToOne(fetch=FetchType.LAZY)
+	@JsonIgnore
+	private User author;
+	
+	public Post() {
+		super();
+	}
+
 	public Post(Long id, String title, String body, User author, Date publishDate) {
 		super();
 		this.id = id;
@@ -57,4 +77,11 @@ public class Post {
 	public void setPublishDate(Date publishDate) {
 		this.publishDate = publishDate;
 	}
+
+	@Override
+	public String toString() {
+		return "Post [id=" + id + ", title=" + title + ", body=" + body + ", publishDate=" + publishDate + "]";
+	}
+	
+	
 }

@@ -1,6 +1,7 @@
 package com.msalihkocak.restservicetrial.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,37 +10,31 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.msalihkocak.restservicetrial.dao.PostDAO;
+import com.msalihkocak.restservicetrial.dao.PostRepository;
+import com.msalihkocak.restservicetrial.exception.PostNotFoundException;
 import com.msalihkocak.restservicetrial.model.Post;
 
 @RestController
-public class PostService {
+public class PostJPAService {
 	
 	@Autowired
-	private PostDAO postDAO;
+	private PostRepository postRepository;
 	
-	@GetMapping("/users/{userId}/posts")
-	public List<Post> getAllPostsOfUser(@PathVariable int userId) {
-		return postDAO.findPostsOfUser(userId);
-	}
-	
-	@GetMapping("/posts/{postId}")
+	@GetMapping("/jpa/posts/{postId}")
 	public Post getPostDetails(@PathVariable Long postId) {
-		return postDAO.findPostById(postId);
+		Optional<Post> post = postRepository.findById(postId);
+		if(!post.isPresent())
+			throw new PostNotFoundException("Post not found with id: " + postId);
+		return post.orElse(new Post());
 	}
 	
-	@GetMapping("/posts")
+	@GetMapping("/jpa/posts")
 	public List<Post> getAllPosts(){
-		return postDAO.findPosts();
+		return postRepository.findAll();
 	}
 	
-	@PostMapping("/users/{userId}/posts")
-	public Post createPostForUser(@PathVariable int userId, @RequestBody Post post) {
-		return postDAO.savePostForUser(userId, post);
-	}
-	
-	@PostMapping("/posts")
+	@PostMapping("/jpa/posts")
 	public Post createPost(@RequestBody Post post) {
-		return postDAO.savePost(post);
+		return postRepository.save(post);
 	}
 }

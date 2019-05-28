@@ -34,7 +34,7 @@ public class UserService {
 		return service.findAll();
 	}
 	
-	@GetMapping("/user/{id}")
+	@GetMapping("/users/{id}")
 	public Resource<User> retrieveUser(@PathVariable int id) {
 		User user = service.findUserById(id);
 		
@@ -60,7 +60,7 @@ public class UserService {
 		return ResponseEntity.created(location).build();
 	}
 	
-	@DeleteMapping("user/{userId}")
+	@DeleteMapping("users/{userId}")
 	public boolean deleteUser(@PathVariable int userId) {
 		return service.removeUserById(userId);
 	}

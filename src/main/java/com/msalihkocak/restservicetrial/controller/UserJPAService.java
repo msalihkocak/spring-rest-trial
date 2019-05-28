@@ -21,9 +21,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.msalihkocak.restservicetrial.dao.UserDAO;
+import com.msalihkocak.restservicetrial.dao.PostRepository;
 import com.msalihkocak.restservicetrial.dao.UserRepository;
 import com.msalihkocak.restservicetrial.exception.UserNotFoundException;
+import com.msalihkocak.restservicetrial.model.Post;
 import com.msalihkocak.restservicetrial.model.User;
 
 @RestController
@@ -32,12 +33,15 @@ public class UserJPAService {
 	@Autowired
 	private UserRepository userRepository;
 	
+	@Autowired
+	private PostRepository postRepository;
+	
 	@GetMapping("/jpa/users")
 	public List<User> retrieveAllUsers() {
 		return userRepository.findAll();
 	}
 	
-	@GetMapping("/jpa/user/{id}")
+	@GetMapping("/jpa/users/{id}")
 	public Resource<User> retrieveUser(@PathVariable int id) {
 		Optional<User> user = userRepository.findById(id);
 		
@@ -63,8 +67,29 @@ public class UserJPAService {
 		return ResponseEntity.created(location).build();
 	}
 	
-	@DeleteMapping("/jpa/user/{userId}")
+	@DeleteMapping("/jpa/users/{userId}")
 	public void deleteUser(@PathVariable int userId) {
 		userRepository.deleteById(userId);
+	}
+	
+	@GetMapping("/jpa/users/{userId}/posts")
+	public List<Post> getAllPostsOfUser(@PathVariable int userId) {
+		Optional<User> user = userRepository.findById(userId);
+		if(!user.isPresent())
+			throw new UserNotFoundException("id-" + userId);
+		return user.orElse(new User()).getPosts();
+	}
+	
+	@PostMapping("/jpa/users/{userId}/posts")
+	public ResponseEntity<Post> createPostForUser(@PathVariable int userId, @RequestBody Post post) {
+		Optional<User> user = userRepository.findById(userId);
+		if(!user.isPresent())
+			throw new UserNotFoundException("id-" + userId);
+		post.setAuthor(user.get());
+		postRepository.save(post);
+		URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+				  .path("/{id}")
+				  .buildAndExpand(post.getId()).toUri();
+		return ResponseEntity.created(location).build();
 	}
 }
